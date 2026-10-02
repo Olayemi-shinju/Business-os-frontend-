@@ -63,7 +63,7 @@ const date = new Date().getFullYear()
 
 const SideNav = () => {
     return (
-        /* Upgraded to semi-transparent white (bg-white/70), added high-end blur (backdrop-blur-md), and a deep drop shadow (shadow-xl) */
+       
         <div className="w-16 md:w-1/6 bg-white/70 backdrop-blur-md h-screen border-r border-slate-300/50 text-gray-700 shadow-xl transition-all duration-300">
 
             {/* section 1 */}
