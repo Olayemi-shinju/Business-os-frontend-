@@ -22,7 +22,7 @@ const workSpace = [
         label: "Inventory",
         path: "/inventory",
         icon: MdOutlineInventory,
-        notification: 3 // 👈 Dynamically handled now
+        notification: 3 
     },
     {
         label: "Sales",
