@@ -16,3 +16,29 @@
   background-color: #f3e8ff; 
 
 }
+.btn-new-sale {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  color: #7e22ce; 
+  transition: color 0.25s ease-out; 
+}
+
+.btn-new-sale::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: #893eca; 
+  z-index: -1;
+  transform: translate(100%, 100%);
+  transition: transform 0.5s ease-out;
+}
+
+
+.btn-new-sale:hover {
+  color: white !important; 
+}
+
+.btn-new-sale:hover::before {
+  transform: translate(0, 0);
+}
