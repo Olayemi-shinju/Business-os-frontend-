@@ -4,7 +4,7 @@ import TopNav from "./TopNav";
 
 const Layout = () => {
     return (
-        <div className="flex h-scree">
+        <div className="flex h-screen">
             <SideNav />
             <main className="flex-1 overflow-y-auto">
                 <TopNav/>

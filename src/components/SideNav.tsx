@@ -1,3 +1,4 @@
+import React from 'react';
 import { IoStorefrontSharp } from "react-icons/io5";
 import { RiBarChartHorizontalLine } from "react-icons/ri";
 import { AiFillProduct } from "react-icons/ai";
@@ -12,139 +13,111 @@ import { IoSettingsOutline } from "react-icons/io5";
 import "../App.css";
 
 const workSpace = [
-    {
-        label: "Overview",
-        path: "/",
-        icon: IoStorefrontSharp
-    },
-    {
-        label: "Products",
-        path: "/products",
-        icon: AiFillProduct
-    },
-    {
-        label: "Inventory",
-        path: "/inventory",
-        icon: MdOutlineInventory,
-        notification: 3 
-    },
-    {
-        label: "Sales",
-        path: "/sales",
-        icon: FiShoppingCart
-    },
-    {
-        label: "Staff",
-        path: "/staff",
-        icon: IoMdPerson
-    },
+    { label: "Overview", path: "/", icon: IoStorefrontSharp },
+    { label: "Products", path: "/products", icon: AiFillProduct },
+    { label: "Inventory", path: "/inventory", icon: MdOutlineInventory, notification: 3 },
+    { label: "Sales", path: "/sales", icon: FiShoppingCart },
+    { label: "Staff", path: "/staff", icon: IoMdPerson },
 ];
 
 const Manage = [
-    {
-        label: "Purchase Order",
-        path: "/order",
-        icon: FaWpforms
-    },
-    {
-        label: "Report",
-        path: "/report",
-        icon: FaRegChartBar
-    },
-    {
-        label: "Suppliers",
-        path: "/supplies",
-        icon: FaTruck
-    },
-    {
-        label: "Settings",
-        path: "/settings",
-        icon: IoSettingsOutline
-    },
-]
+    { label: "Purchase Order", path: "/order", icon: FaWpforms },
+    { label: "Report", path: "/report", icon: FaRegChartBar },
+    { label: "Suppliers", path: "/supplies", icon: FaTruck },
+    { label: "Settings", path: "/settings", icon: IoSettingsOutline },
+];
 
-const date = new Date().getFullYear()
+const currentYear = new Date().getFullYear();
 
 const SideNav = () => {
     return (
        
-        <div className="w-16 md:w-1/6 bg-white/70 backdrop-blur-md h-screen border-r border-slate-300/50 text-gray-700 shadow-xl transition-all duration-300">
-
-            {/* section 1 */}
-            <section>
-                <div className="flex gap-2 mt-4 items-center justify-center cursor-pointer">
-                    <div>
-                        <RiBarChartHorizontalLine className="font-extrabold text-xl text-purple-800" />
+        <div className="w-16 md:w-1/6  inset-y-0 left-0 z-50 bg-white/70 backdrop-blur-md h-screen border-r border-slate-200 text-gray-700 shadow-xl transition-all duration-300 flex flex-col justify-between pb-4">
+            
+          
+            <div>
+             
+                <section className="h-16 flex items-center px-4 md:px-6 border-b border-slate-100">
+                    <div className="flex gap-3 items-center w-full justify-center md:justify-start cursor-pointer">
+                        <RiBarChartHorizontalLine className="font-extrabold text-xl text-purple-800 shrink-0" />
+                        <span className="font-bold text-base text-purple-800 hidden md:block tracking-wide">Store Name</span>
                     </div>
-                    <div className="hidden md:block">
-                        <p className="font-bold text-lg text-purple-800">Store Name</p>
+                </section>
+
+          
+                <section className="mt-4">
+                    <div className="px-4 md:px-6 py-2 hidden md:block">
+                        <p className="text-[10px] font-bold text-slate-400 tracking-wider">WORK SPACE</p>
                     </div>
-                </div>
-              
-            </section>
 
-            {/* section 2 */}
-            <section>
-                <div className="px-5 py-4 mt-7 hidden md:block">
-                    <div>
-                        <p className="text-xs font-semibold text-slate-400 text-shadow-2xs">WORK SPACE</p>
+                    <div className="flex flex-col gap-1 px-2 md:px-3">
+                        {workSpace.map(({ label, path, icon: Icon, notification }) => (
+                            <NavLink
+                                key={path}
+                                to={path}
+                              
+                                className={({ isActive }) => 
+                                    `flex items-center justify-center md:justify-between w-full p-2.5 rounded-lg text-sm transition-all duration-200 group hover:bg-purple-50 ${
+                                        isActive 
+                                            ? 'bg-purple-100 text-purple-800 font-semibold' 
+                                            : 'text-slate-600 hover:text-purple-700'
+                                    }`
+                                }
+                            >
+                                <div className="flex items-center gap-3">
+                               
+                                    <Icon className="text-lg shrink-0 transition-colors duration-200" />
+                                    <span className="hidden md:block">{label}</span>
+                                </div>
+
+                                {notification !== undefined && notification > 0 && (
+                                   
+                                    <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-4 text-center leading-none hidden md:block">
+                                        {notification}
+                                    </span>
+                                )}
+                            </NavLink>
+                        ))}
                     </div>
-                </div>
+                </section>
 
-                <div className="flex flex-col gap-1 px-2 md:px-3 mt-4 md:mt-0">
-                    {workSpace?.map(({ label, path, icon: Icon, notification }) => (
-                        <NavLink
-                            key={path}
-                            to={path}
-                            className="nav-link flex items-center justify-center md:justify-between w-full"
-                        >
-
-                            <div className="flex items-center gap-3">
-                                <Icon className="text-md shrink-0 text-slate-400" />
-                                <span className="font-medium text-xs text-slate-500 hidden md:block">{label}</span>
-                            </div>
-
-                            {notification !== undefined && notification > 0 && (
-                                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-3 text-center leading-none hidden md:block">
-                                    {notification}
-                                </span>
-                            )}
-                        </NavLink>
-                    ))}
-                </div>
-            </section>
-
-            {/* section 3 */}
-            <section>
-                <div className="px-5 py-4 hidden md:block">
-                    <div>
-                        <p className="text-xs font-semibold text-slate-400 text-shadow-2xs">MANAGE</p>
+           
+                <section className="mt-4">
+                    <div className="px-4 md:px-6 py-2 hidden md:block">
+                        <p className="text-[10px] font-bold text-slate-400 tracking-wider">MANAGE</p>
                     </div>
-                </div>
 
-                <div className="flex flex-col gap-1 px-2 md:px-3">
-                    {Manage?.map(({ label, path, icon: Icon }) => (
-                        <NavLink
-                            key={path}
-                            to={path}
-                            className="nav-link flex items-center justify-center md:justify-between w-full"
-                        >
+                    <div className="flex flex-col gap-1 px-2 md:px-3">
+                        {Manage.map(({ label, path, icon: Icon }) => (
+                            <NavLink
+                                key={path}
+                                to={path}
+                                className={({ isActive }) => 
+                                    `flex items-center justify-center md:justify-between w-full p-2.5 rounded-lg text-sm transition-all duration-200 group hover:bg-purple-50 ${
+                                        isActive 
+                                            ? 'bg-purple-100 text-purple-800 font-semibold' 
+                                            : 'text-slate-600 hover:text-purple-700'
+                                    }`
+                                }
+                            >
+                                <div className="flex items-center gap-3">
+                                    <Icon className="text-lg shrink-0 transition-colors duration-200" />
+                                    <span className="hidden md:block">{label}</span>
+                                </div>
+                            </NavLink>
+                        ))}
+                    </div>
+                </section>
+            </div>
 
-                            <div className="flex items-center gap-3">
-                                <Icon className="text-md shrink-0 text-slate-400" />
-                                <span className="font-medium text-xs text-slate-500 hidden md:block">{label}</span>
-                            </div>
-
-                        </NavLink>
-                    ))}
-
+        
+            <section className="hidden md:block px-4 md:px-6">
+                <div className="mb-3">
+                    <hr className="border-slate-200" />
                 </div>
-                <div className="p-5 mt-9 hidden md:block">
-                    <hr className="border-slate-400" />
-                </div>
-                <div className="hidden md:block">
-                    <p className="text-xs text-center text-slate-500 font-extralight">© {`${date}`} AOD Solatricity</p>
-                </div>
+                <p className="text-[10px] text-center text-slate-400 font-normal">
+                    © {currentYear} AOD Solatricity
+                </p>
             </section>
         </div>
     );

@@ -1,6 +1,10 @@
 import { FiPlus } from "react-icons/fi";
 import "../App.css"
 import StatCard from "../components/StatCard";
+import SalesOverviewChart from "../components/SalesOverviewChart";
+import TopProductsChart from "../components/TopProductsChart";
+import RecentSalesTable from "../components/RecentSalesTable";
+import LowStockTable from "../components/LowStockTable";
 const Overview = () => {
   const date = new Date()
 
@@ -12,7 +16,7 @@ const Overview = () => {
   })
 
   return (
-    <div className="bg-gray-100 p-8 h-full">
+    <div className="bg-gray-100 p-8 min-h-screen">
       {/* section 1 */}
       <section>
         <div>
@@ -40,8 +44,41 @@ const Overview = () => {
       {/* section 2 */}
 
       <section>
-          <StatCard/>
+        <StatCard />
       </section>
+
+      {/* section 3 */}
+      <section className="w-full">
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+
+
+          <div className="lg:col-span-2 w-full">
+            <SalesOverviewChart />
+          </div>
+
+
+          <div className="lg:col-span-1 w-full">
+            <TopProductsChart />
+          </div>
+
+        </div>
+      </section>
+
+
+      {/* section 4 */}
+
+      <section>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full mt-4">
+          <div className="lg:col-span-1 w-full">
+            <LowStockTable/>
+          </div>
+          <div className="lg:col-span-2 w-full">
+            <RecentSalesTable/>
+          </div>
+        </div>
+      </section>
+
     </div>
   )
 }
