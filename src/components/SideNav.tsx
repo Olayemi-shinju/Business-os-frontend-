@@ -1,4 +1,3 @@
-import React from 'react';
 import { IoStorefrontSharp } from "react-icons/io5";
 import { RiBarChartHorizontalLine } from "react-icons/ri";
 import { AiFillProduct } from "react-icons/ai";
@@ -31,12 +30,12 @@ const currentYear = new Date().getFullYear();
 
 const SideNav = () => {
     return (
-       
+
         <div className="w-16 md:w-1/6  inset-y-0 left-0 z-50 bg-white/70 backdrop-blur-md h-screen border-r border-slate-200 text-gray-700 shadow-xl transition-all duration-300 flex flex-col justify-between pb-4">
-            
-          
+
+
             <div>
-             
+
                 <section className="h-16 flex items-center px-4 md:px-6 border-b border-slate-100">
                     <div className="flex gap-3 items-center w-full justify-center md:justify-start cursor-pointer">
                         <RiBarChartHorizontalLine className="font-extrabold text-xl text-purple-800 shrink-0" />
@@ -44,7 +43,7 @@ const SideNav = () => {
                     </div>
                 </section>
 
-          
+
                 <section className="mt-4">
                     <div className="px-4 md:px-6 py-2 hidden md:block">
                         <p className="text-[10px] font-bold text-slate-400 tracking-wider">WORK SPACE</p>
@@ -55,23 +54,18 @@ const SideNav = () => {
                             <NavLink
                                 key={path}
                                 to={path}
-                              
-                                className={({ isActive }) => 
-                                    `flex items-center justify-center md:justify-between w-full p-2.5 rounded-lg text-sm transition-all duration-200 group hover:bg-purple-50 ${
-                                        isActive 
-                                            ? 'bg-purple-100 text-purple-800 font-semibold' 
-                                            : 'text-slate-600 hover:text-purple-700'
-                                    }`
-                                }
+
+                                className='flex items-center nav-link justify-center md:justify-between w-full p-2.5 rounded-lg text-sm'
+
                             >
                                 <div className="flex items-center gap-3">
-                               
+
                                     <Icon className="text-lg shrink-0 transition-colors duration-200" />
                                     <span className="hidden md:block">{label}</span>
                                 </div>
 
                                 {notification !== undefined && notification > 0 && (
-                                   
+
                                     <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-4 text-center leading-none hidden md:block">
                                         {notification}
                                     </span>
@@ -81,7 +75,7 @@ const SideNav = () => {
                     </div>
                 </section>
 
-           
+
                 <section className="mt-4">
                     <div className="px-4 md:px-6 py-2 hidden md:block">
                         <p className="text-[10px] font-bold text-slate-400 tracking-wider">MANAGE</p>
@@ -92,13 +86,8 @@ const SideNav = () => {
                             <NavLink
                                 key={path}
                                 to={path}
-                                className={({ isActive }) => 
-                                    `flex items-center justify-center md:justify-between w-full p-2.5 rounded-lg text-sm transition-all duration-200 group hover:bg-purple-50 ${
-                                        isActive 
-                                            ? 'bg-purple-100 text-purple-800 font-semibold' 
-                                            : 'text-slate-600 hover:text-purple-700'
-                                    }`
-                                }
+                                className='flex items-center nav-link justify-center md:justify-between w-full p-2.5 rounded-lg text-sm'
+                                
                             >
                                 <div className="flex items-center gap-3">
                                     <Icon className="text-lg shrink-0 transition-colors duration-200" />
@@ -110,7 +99,7 @@ const SideNav = () => {
                 </section>
             </div>
 
-        
+
             <section className="hidden md:block px-4 md:px-6">
                 <div className="mb-3">
                     <hr className="border-slate-200" />
