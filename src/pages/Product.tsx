@@ -1,4 +1,3 @@
-import React from 'react'
 import { FiPlus, FiSearch, FiSliders } from 'react-icons/fi'
 
 const Product = () => {
