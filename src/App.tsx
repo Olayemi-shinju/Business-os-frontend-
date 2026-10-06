@@ -5,8 +5,6 @@ import Product from "./pages/Product";
 import Inventory from "./pages/Inventory";
 import Sales  from "./pages/Sales";
 import Staff from "./pages/Staff";
-import PurchaseOrder from "./pages/PurchaseOrder";
-import Supplies from "./pages/Supplies";
 import Report from "./pages/Report";
 import Settings from "./pages/Settings";
 
@@ -20,9 +18,7 @@ function App(){
                 <Route path="inventory" element={<Inventory/>}/>
                 <Route path="sales" element={<Sales/>}/>
                 <Route path="staff" element={<Staff/>}/>
-                <Route path="order" element={<PurchaseOrder/>}/>
-                <Route path="supplies" element={<Supplies/>}/>
-                <Route path="report" element={<Report/>}/>
+              <Route path="report" element={<Report/>}/>
                 <Route path="settings" element={<Settings/>}/>
 
 
