@@ -33,7 +33,7 @@ const Product = () => {
           <div>
             <button className="flex btn-new-sale cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200">
               <FiPlus className="text-base" />
-              New sale
+                Add Product
             </button>
           </div>
         </div>

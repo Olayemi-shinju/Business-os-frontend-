@@ -1,3 +1,4 @@
+import { FiPlus } from 'react-icons/fi'
 import '../App.css'
 
 const Staff = () => {
@@ -23,11 +24,17 @@ const Staff = () => {
         </div>
 
         <div className="my-3 flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
-          <div className="flex gap-3 flex-col">
-            <p className="text-2xl font-medium text-gray-900">Good Morning, Alex</p>
-            <span className="text-xs font-semibold text-slate-500">Manage user access and review operational activity.</span>
-          </div>
-        </div>
+                <div className="flex gap-3 flex-col">
+                  <p className="text-2xl font-medium">Good Morning, Alex</p>
+                  <span className="text-xs font-semibold text-slate-500">Manage Your Staff.</span>
+                </div>
+                <div>
+                  <button className="flex btn-new-sale cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200">
+                    <FiPlus className="text-base" />
+                      Add Staff
+                  </button>
+                </div>
+              </div>
       </section>
 
       <section className="mt-8 bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
