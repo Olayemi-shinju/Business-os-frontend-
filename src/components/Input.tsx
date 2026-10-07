@@ -7,7 +7,7 @@ export const Input = ({ icon: Icon, ...props }) => {
         </span>
       )}
       <input
-        className={`w-full text-white py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+        className={`w-full text-xs py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
           Icon ? "pl-10" : "pl-3"
         }`}
         {...props}

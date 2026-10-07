@@ -5,7 +5,6 @@ import { MdOutlineInventory } from "react-icons/md";
 import { FiShoppingCart } from "react-icons/fi";
 import { IoMdPerson } from "react-icons/io";
 import { NavLink } from "react-router-dom";
-import { FaRegChartBar } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
 import "../App.css";
 
@@ -18,7 +17,6 @@ const workSpace = [
 ];
 
 const Manage = [
-    { label: "Report", path: "/report", icon: FaRegChartBar },
     { label: "Settings", path: "/settings", icon: IoSettingsOutline },
 ];
 
