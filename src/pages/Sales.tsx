@@ -1,8 +1,20 @@
+import { useState } from 'react'
 import { FiPlus } from 'react-icons/fi'
+import NewSaleModal from '../modal/CreateSale'
 import '../App.css'
 
 const Sales = () => {
   const date = new Date()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const mockVariations = [
+    { id: "var_1", name: "Solar Panel 450W (Mono)", price: 180000 },
+    { id: "var_2", name: "Lithium Battery 100Ah 12V", price: 499000 },
+    { id: "var_3", name: "Inverter 3KVA Pure Sine", price: 295000 },
+    { id: "var_4", name: "Charge Controller MPPT 60A", price: 75000 },
+    { id: "var_5", name: "Solar Cable 6mm (Red)", price: 90000 }
+  ]
 
   const formattedDate = date.toLocaleDateString("en-US", {
     weekday: "long",
@@ -12,11 +24,11 @@ const Sales = () => {
   })
 
   const mockSalesLogs = [
-    { id: 1, invoice: "INV-2026-001", customer: "AOD Solatricity", items: 4, total: 720, method: "Bank Transfer", date: "Today, 11:30 AM", status: "Paid" },
-    { id: 2, invoice: "INV-2026-002", customer: "Highland Greens", items: 1, total: 499, method: "Card", date: "Today, 09:15 AM", status: "Paid" },
-    { id: 3, invoice: "INV-2026-003", customer: "Capital Hub Ltd", items: 2, total: 590, method: "Bank Transfer", date: "Yesterday, 04:45 PM", status: "Pending" },
-    { id: 4, invoice: "INV-2026-004", customer: "Private Client", items: 1, total: 75, method: "Cash", date: "Oct 3, 2026", status: "Paid" },
-    { id: 5, invoice: "INV-2026-005", customer: "Olayemi Towers", items: 3, total: 270, method: "Card", date: "Oct 2, 2026", status: "Paid" }
+    { id: 1, invoice: "INV-2026-001", customer: "AOD Solatricity", items: 4, total: 720000, method: "Bank Transfer", date: "Today, 11:30 AM", status: "Paid" },
+    { id: 2, invoice: "INV-2026-002", customer: "Highland Greens", items: 1, total: 499000, method: "Card", date: "Today, 09:15 AM", status: "Paid" },
+    { id: 3, invoice: "INV-2026-003", customer: "Capital Hub Ltd", items: 2, total: 590000, method: "Bank Transfer", date: "Yesterday, 04:45 PM", status: "Paid" },
+    { id: 4, invoice: "INV-2026-004", customer: "Private Client", items: 1, total: 75000, method: "Cash", date: "Oct 3, 2026", status: "Paid" },
+    { id: 5, invoice: "INV-2026-005", customer: "Olayemi Towers", items: 3, total: 270000, method: "Card", date: "Oct 2, 2026", status: "Paid" }
   ]
 
   return (
@@ -32,7 +44,10 @@ const Sales = () => {
             <span className="text-xs font-semibold text-slate-500">Here's what's happening with your store today.</span>
           </div>
           <div>
-            <button className="flex btn-new-sale cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200">
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="flex btn-new-sale cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200"
+            >
               <FiPlus className="text-base" />
               New sale
             </button>
@@ -82,6 +97,12 @@ const Sales = () => {
           </table>
         </div>
       </section>
+
+     <NewSaleModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        mockVariations={mockVariations}
+      />
     </div>
   )
 }
