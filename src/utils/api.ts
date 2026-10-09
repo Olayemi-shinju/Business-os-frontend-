@@ -1,5 +1,5 @@
-const API_BASE_URI = import.meta.env.API_BASE_URI
-
+const API_BASE_URI = import.meta.env.VITE_API_BASE_URI
+console.log(API_BASE_URI)
 
 export const api = {
     get: async(endpoint: string)=>{
