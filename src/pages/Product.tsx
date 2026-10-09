@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { FiPlus, FiSearch, FiSliders } from 'react-icons/fi'
+import AddProductModal from '../modal/CreateProduct'
 
 const Product = () => {
   const date = new Date()
-
+  const [isModalOpen, setModalOpen] = useState(false)
   const formattedDate = date.toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
@@ -31,9 +33,11 @@ const Product = () => {
             <span className="text-xs font-semibold text-slate-500">Here's what's happening with your store today.</span>
           </div>
           <div>
-            <button className="flex btn-new-sale cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200">
+            <button
+              onClick={() => setModalOpen(true)}
+              className="flex btn-new-sale cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200">
               <FiPlus className="text-base" />
-                Add Product
+              Add Product
             </button>
           </div>
         </div>
@@ -43,9 +47,9 @@ const Product = () => {
         <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="relative w-full sm:w-80">
             <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-base" />
-            <input 
-              type="text" 
-              placeholder="Search products, SKUs..." 
+            <input
+              type="text"
+              placeholder="Search products, SKUs..."
               className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
             />
           </div>
@@ -88,12 +92,10 @@ const Product = () => {
                   <td className="py-4 px-6 font-semibold text-gray-900">₦{product.price}</td>
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${
-                        product.qty === 0 ? 'bg-red-500' : product.qty <= 5 ? 'bg-amber-500' : 'bg-emerald-500'
-                      }`} />
-                      <span className={`font-semibold ${
-                        product.qty === 0 ? 'text-red-600' : product.qty <= 5 ? 'text-amber-600' : 'text-emerald-600'
-                      }`}>
+                      <span className={`w-2 h-2 rounded-full ${product.qty === 0 ? 'bg-red-500' : product.qty <= 5 ? 'bg-amber-500' : 'bg-emerald-500'
+                        }`} />
+                      <span className={`font-semibold ${product.qty === 0 ? 'text-red-600' : product.qty <= 5 ? 'text-amber-600' : 'text-emerald-600'
+                        }`}>
                         {product.qty === 0 ? 'Out of stock' : `${product.qty} units`}
                       </span>
                     </div>
@@ -110,6 +112,12 @@ const Product = () => {
           </table>
         </div>
       </section>
+
+      <AddProductModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+       
+      />
     </div>
   )
 }

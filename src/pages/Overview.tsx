@@ -5,7 +5,10 @@ import SalesOverviewChart from "../components/SalesOverviewChart";
 import TopProductsChart from "../components/TopProductsChart";
 import RecentSalesTable from "../components/RecentSalesTable";
 import LowStockTable from "../components/LowStockTable";
+import CreateCategory from "../modal/CreateCategory";
+import { useState } from "react";
 const Overview = () => {
+  const [isModalOpen, setModalOpen] = useState(false)
   const date = new Date()
 
   const formattedDate = date.toLocaleDateString("en-US", {
@@ -28,12 +31,14 @@ const Overview = () => {
             <p className="text-2xl font-medium">Good Morning, Alex</p>
             <span className="text-xs font-semibold text-slate-500">Here's what's happening with your store today.</span>
           </div>
-          {/* <div>
-            <button className="flex btn-new-sale cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200">
+          <div>
+            <button 
+            onClick={()=>setModalOpen(true)}
+            className="flex btn-new-sale cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200">
               <FiPlus className="text-base" />
-              New sale
+              Add Category
             </button>
-          </div> */}
+          </div>
 
 
         </div>
@@ -79,6 +84,10 @@ const Overview = () => {
         </div>
       </section>
 
+    <CreateCategory
+    isOpen = {isModalOpen}
+    onClose={()=>setModalOpen(false)}
+    />
     </div>
   )
 }
