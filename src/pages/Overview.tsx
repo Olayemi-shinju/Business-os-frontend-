@@ -7,9 +7,15 @@ import RecentSalesTable from "../components/RecentSalesTable";
 import LowStockTable from "../components/LowStockTable";
 import CreateCategory from "../modal/CreateCategory";
 import { useState } from "react";
+import { useUser } from "../context/useContext";
+import { BiLoader } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
+
 const Overview = () => {
   const [isModalOpen, setModalOpen] = useState(false)
   const date = new Date()
+  const { user } = useUser()
+  const navigate = useNavigate()
 
   const formattedDate = date.toLocaleDateString("en-US", {
     weekday: "long",
@@ -17,6 +23,13 @@ const Overview = () => {
     month: "long",
     day: "numeric",
   })
+
+
+  if (!user) {
+    navigate("/login")
+    return;
+  }
+
 
   return (
     <div className="bg-gray-100 p-8 min-h-screen">
@@ -28,13 +41,13 @@ const Overview = () => {
 
         <div className="my-3 flex justify-between w-full">
           <div className="flex gap-3 flex-col">
-            <p className="text-2xl font-medium">Good Morning, Alex</p>
+            <p className="text-2xl font-medium">Good Morning, {user?.firstName}</p>
             <span className="text-xs font-semibold text-slate-500">Here's what's happening with your store today.</span>
           </div>
           <div>
-            <button 
-            onClick={()=>setModalOpen(true)}
-            className="flex btn-new-sale cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200">
+            <button
+              onClick={() => setModalOpen(true)}
+              className="flex btn-new-sale cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200">
               <FiPlus className="text-base" />
               Add Category
             </button>
@@ -76,18 +89,18 @@ const Overview = () => {
       <section>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full mt-4">
           <div className="lg:col-span-1 w-full">
-            <LowStockTable/>
+            <LowStockTable />
           </div>
           <div className="lg:col-span-2 w-full">
-            <RecentSalesTable/>
+            <RecentSalesTable />
           </div>
         </div>
       </section>
 
-    <CreateCategory
-    isOpen = {isModalOpen}
-    onClose={()=>setModalOpen(false)}
-    />
+      <CreateCategory
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   )
 }

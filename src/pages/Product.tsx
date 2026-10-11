@@ -1,8 +1,12 @@
 import { useState } from 'react'
 import { FiPlus, FiSearch, FiSliders } from 'react-icons/fi'
 import AddProductModal from '../modal/CreateProduct'
+import { useUser } from '../context/useContext'
+import { useNavigate } from 'react-router-dom'
 
 const Product = () => {
+  const {user} = useUser()
+  const navigate = useNavigate()
   const date = new Date()
   const [isModalOpen, setModalOpen] = useState(false)
   const formattedDate = date.toLocaleDateString("en-US", {
@@ -20,6 +24,11 @@ const Product = () => {
     { id: 5, name: "Solar Cable 6mm (100m)", sku: "CBL-6MM", category: "Accessories", cost: 60, price: 90, qty: 8 }
   ]
 
+  
+  if (!user) {
+    navigate("/login")
+    return;
+  }
   return (
     <div className='min-h-screen p-8 bg-gray-50 text-gray-800'>
       <section>
@@ -29,7 +38,7 @@ const Product = () => {
 
         <div className="my-3 flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
           <div className="flex gap-3 flex-col">
-            <p className="text-2xl font-medium">Good Morning, Alex</p>
+            <p className="text-2xl font-medium">Good Morning, {user?.firstName}</p>
             <span className="text-xs font-semibold text-slate-500">Here's what's happening with your store today.</span>
           </div>
           <div>

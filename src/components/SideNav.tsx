@@ -2,11 +2,13 @@ import { IoStorefrontSharp } from "react-icons/io5";
 import { RiBarChartHorizontalLine } from "react-icons/ri";
 import { AiFillProduct } from "react-icons/ai";
 import { MdOutlineInventory } from "react-icons/md";
-import { FiShoppingCart } from "react-icons/fi";
+import { FiLogOut, FiShoppingCart } from "react-icons/fi";
 import { IoMdPerson } from "react-icons/io";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { IoSettingsOutline } from "react-icons/io5";
 import "../App.css";
+import toast from "react-hot-toast";
+import { api } from "../utils/api";
 
 const workSpace = [
     { label: "Overview", path: "/", icon: IoStorefrontSharp },
@@ -22,7 +24,20 @@ const Manage = [
 
 const currentYear = new Date().getFullYear();
 
+
+
 const SideNav = () => {
+    const navigate = useNavigate()
+
+    const handleLogout = async () => {
+        try {
+            await api.post('logout', {});
+            toast.success('Logged out successfully');
+            navigate('/login');
+        } catch (error) {
+            toast.error('Failed to logout. Please try again.');
+        }
+    };
     return (
 
         <div className="w-16 md:w-1/6  inset-y-0 left-0 z-50 bg-white/70 backdrop-blur-md h-screen border-r border-slate-200 text-gray-700 shadow-xl transition-all duration-300 flex flex-col justify-between pb-4">
@@ -81,7 +96,7 @@ const SideNav = () => {
                                 key={path}
                                 to={path}
                                 className='flex items-center nav-link justify-center md:justify-between w-full p-2.5 rounded-lg text-sm'
-                                
+
                             >
                                 <div className="flex items-center gap-3">
                                     <Icon className="text-lg shrink-0 transition-colors duration-200" />
@@ -93,6 +108,16 @@ const SideNav = () => {
                 </section>
             </div>
 
+            <div className="mt-auto pt-4 border-t border-slate-100">
+                <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-slate-500 hover:text-red-600 rounded-xl hover:bg-red-50/50 transition-all duration-200 cursor-pointer group"
+                >
+                    <FiLogOut className="text-sm items-center text-slate-400 group-hover:text-red-500 transition-colors" />
+                    Sign Out
+                </button>
+            </div>
 
             <section className="hidden md:block px-4 md:px-6">
                 <div className="mb-3">
@@ -102,6 +127,8 @@ const SideNav = () => {
                     © {currentYear} AOD Solatricity
                 </p>
             </section>
+
+
         </div>
     );
 };

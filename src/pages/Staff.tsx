@@ -2,8 +2,12 @@ import { useState } from 'react'
 import { FiPlus } from 'react-icons/fi'
 import CreateStaff from '../modal/CreateStaff'
 import '../App.css'
+import { useUser } from '../context/useContext'
+import { useNavigate } from 'react-router-dom'
 
 const Staff = () => {
+  const {user} = useUser()
+  const navigate = useNavigate() 
   const date = new Date()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -18,6 +22,11 @@ const Staff = () => {
     { id: 1, name: "Alex", email: "alex@store.com", role: "Admin / Owner", shiftStatus: "Active", access: "Full Control" },
     { id: 2, name: "Sarah", email: "sarah@store.com", role: "Store Staff", shiftStatus: "Active", access: "Sales & Stock Only" }
   ]
+  
+  if (!user) {
+    navigate("/login")
+    return;
+  }
 
   return (
     <div className='min-h-screen p-8 bg-gray-50 text-gray-800'>
@@ -28,7 +37,7 @@ const Staff = () => {
 
         <div className="my-3 flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
           <div className="flex gap-3 flex-col">
-            <p className="text-2xl font-medium">Good Morning, Alex</p>
+            <p className="text-2xl font-medium">Good Morning, {user?.firstName}</p>
             <span className="text-xs font-semibold text-slate-500">Manage Your Staff.</span>
           </div>
           <div>

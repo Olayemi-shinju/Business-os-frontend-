@@ -2,8 +2,12 @@ import { useState } from 'react'
 import { FiPlus } from 'react-icons/fi'
 import NewSaleModal from '../modal/CreateSale'
 import '../App.css'
+import { useUser } from '../context/useContext'
+import { useNavigate } from 'react-router-dom'
 
 const Sales = () => {
+  const {user} =useUser()
+  const navigate = useNavigate()
   const date = new Date()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -22,6 +26,11 @@ const Sales = () => {
     month: "long",
     day: "numeric",
   })
+  
+  if (!user) {
+    navigate("/login")
+    return;
+  }
 
   const mockSalesLogs = [
     { id: 1, invoice: "INV-2026-001", customer: "AOD Solatricity", items: 4, total: 720000, method: "Bank Transfer", date: "Today, 11:30 AM", status: "Paid" },
@@ -40,7 +49,7 @@ const Sales = () => {
 
         <div className="my-3 flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
           <div className="flex gap-3 flex-col">
-            <p className="text-2xl font-medium text-gray-900">Good Morning, Alex</p>
+            <p className="text-2xl font-medium text-gray-900">Good Morning, {user?.firstName}</p>
             <span className="text-xs font-semibold text-slate-500">Here's what's happening with your store today.</span>
           </div>
           <div>

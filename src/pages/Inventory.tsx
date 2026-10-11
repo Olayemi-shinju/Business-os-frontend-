@@ -1,7 +1,11 @@
 import { FiPlus } from 'react-icons/fi'
 import '../App.css'
+import { useUser } from '../context/useContext'
+import { useNavigate } from 'react-router-dom'
 
 const Inventory = () => {
+    const { user } = useUser()
+    const navigate =useNavigate()
   const date = new Date()
 
   const formattedDate = date.toLocaleDateString("en-US", {
@@ -19,6 +23,12 @@ const Inventory = () => {
     { id: 5, name: "Solar Cable 6mm (100m)", sku: "CBL-6MM", type: "Sale", qty: 4, operator: "Alex", date: "Oct 2, 2026", status: "Completed" }
   ]
 
+  
+  if (!user) {
+    navigate("/login")
+    return;
+  }
+
   return (
     <div className='min-h-screen p-8 bg-gray-50 text-gray-800'>
       <section>
@@ -28,7 +38,7 @@ const Inventory = () => {
 
         <div className="my-3 flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
           <div className="flex gap-3 flex-col">
-            <p className="text-2xl font-medium">Good Morning, Alex</p>
+            <p className="text-2xl font-medium">Good Morning, {user?.firstName}</p>
             <span className="text-xs font-semibold text-slate-500">Here's what's happening with your store today.</span>
           </div>
           {/* <div>

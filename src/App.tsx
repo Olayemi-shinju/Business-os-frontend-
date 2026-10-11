@@ -9,6 +9,7 @@ import Settings from "./pages/Settings";
 import Login from "./authentication/Login";
 import Register from "./authentication/Register";
 import { Toaster } from "react-hot-toast";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -17,13 +18,15 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route element={<Layout />}>
-          <Route path="/" element={<Overview />} />
-          <Route path="products" element={<Product />} />
-          <Route path="inventory" element={<Inventory />} />
-          <Route path="sales" element={<Sales />} />
-          <Route path="staff" element={<Staff />} />
-          <Route path="settings" element={<Settings />} />
+        <Route element={<ProtectedRoute/>}>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Overview />} />
+            <Route path="products" element={<Product />} />
+            <Route path="inventory" element={<Inventory />} />
+            <Route path="sales" element={<Sales />} />
+            <Route path="staff" element={<Staff />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
         </Route>
       </Routes>
 
