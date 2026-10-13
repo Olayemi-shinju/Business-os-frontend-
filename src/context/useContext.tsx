@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import type { ReactNode } from "react";
 import { api } from "../utils/api";
 
@@ -26,32 +26,33 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const refreshUser = async () => {
+  
+  const refreshUser = useCallback(async () => {
     try {
-     
+      setLoading(true);
       setError(null);
+
       const result = await api.get("get-data");
-      if (result && result.data) {
+
+      if (result?.success && result?.data && !Array.isArray(result.data)) {
         setUser(result.data);
       } else {
         setUser(null);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setUser(null);
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    refreshUser();
-  }, []);
+    void refreshUser();
+  }, [refreshUser]);
 
   return (
     <UserContext.Provider value={{ user, loading, error, refreshUser, setUser }}>
-    
       {children}
     </UserContext.Provider>
   );

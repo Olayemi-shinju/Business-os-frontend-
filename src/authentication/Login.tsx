@@ -3,13 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { TbLockPassword } from "react-icons/tb";
 import { MdOutlineMail } from "react-icons/md";
-import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { Input } from '../components/Input';
 import "../App.css";
 import { api } from '../utils/api';
+import { useUser } from '../context/useContext'; 
+import { FiEyeOff } from 'react-icons/fi';
 
 const Login = () => {
     const navigate = useNavigate();
+    const { refreshUser } = useUser(); 
     const [loader, setLoader] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
@@ -36,8 +38,11 @@ const Login = () => {
                 email: formData.email.trim(),
                 password: formData.password
             });
+            
+            await refreshUser(); 
+            
             toast.success("Welcome back!");
-            navigate('/');
+            navigate('/', { replace: true }); 
         } catch (error) {
             toast.error("Invalid email or password");
         } finally {
@@ -86,7 +91,7 @@ const Login = () => {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-3 top-2 text-slate-400 hover:text-gray-600 transition-colors cursor-pointer z-10 p-1"
                             >
-                                {showPassword ? <FiEyeOff className="text-sm" /> : <FiEye className="text-sm" />}
+                                {showPassword ? <FiEyeOff className="text-sm" /> : <FiEyeOff className="text-sm" />}
                             </button>
                         </div>
                     </div>

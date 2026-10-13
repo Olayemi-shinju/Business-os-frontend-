@@ -8,14 +8,12 @@ import LowStockTable from "../components/LowStockTable";
 import CreateCategory from "../modal/CreateCategory";
 import { useState } from "react";
 import { useUser } from "../context/useContext";
-import { BiLoader } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
 
 const Overview = () => {
   const [isModalOpen, setModalOpen] = useState(false)
   const date = new Date()
   const { user } = useUser()
-  const navigate = useNavigate()
+
 
   const formattedDate = date.toLocaleDateString("en-US", {
     weekday: "long",
@@ -23,12 +21,6 @@ const Overview = () => {
     month: "long",
     day: "numeric",
   })
-
-
-  if (!user) {
-    navigate("/login")
-    return;
-  }
 
 
   return (
