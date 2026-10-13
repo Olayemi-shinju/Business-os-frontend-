@@ -26,7 +26,6 @@ const Login = () => {
 
     const handleSubmit = async (e: React.BaseSyntheticEvent) => {
         e.preventDefault();
-        console.log(formData)
         if (!formData.email.trim() || !formData.password) {
             toast.error("Please fill in all fields");
             return;
@@ -34,17 +33,17 @@ const Login = () => {
 
         setLoader(true);
         try {
-            await api.post('login', {
+           const res = await api.post('login', {
                 email: formData.email.trim(),
                 password: formData.password
             });
             
             await refreshUser(); 
-            
-            toast.success("Welcome back!");
+           
+            toast.success(res?.message);
             navigate('/', { replace: true }); 
         } catch (error) {
-            toast.error("Invalid email or password");
+            toast.error(error?.message || error?.data.message || "server error");
         } finally {
             setLoader(false);
         }
