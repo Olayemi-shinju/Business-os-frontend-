@@ -21,29 +21,38 @@ type DemoProduct = {
   };
 };
 
+type Category = {
+  id: string;
+  name: string;
+};
+
 type AddProductModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onProductAdded?: (product: DemoProduct) => void;
 };
 
-const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [variationName, setVariationName] = useState("Default");
-  const [costPrice, setCostPrice] = useState("");
-  const [sellingPrice, setSellingPrice] = useState("");
-  const [barcode, setBarcode] = useState("");
-  const [quantity, setQuantity] = useState("0");
-  const [reorderLevel, setReorderLevel] = useState("5");
-  const [category, setCategory] = useState<any[]>([]); // typed array
+const initialForm = {
+  name: "",
+  description: "",
+  categoryId: "",
+  variationName: "Default",
+  costPrice: "",
+  sellingPrice: "",
+  barcode: "",
+  quantity: "0",
+  reorderLevel: "5",
+};
+
+const AddProductModal = ({ isOpen, onClose, onProductAdded }: AddProductModalProps) => {
+  const [form, setForm] = useState(() => ({ ...initialForm }));
+  const [category, setCategory] = useState<Category[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  // Always call hooks in the same order. Guard the effect's work by checking isOpen inside it.
+  // Fetch categories only when modal is open
   useEffect(() => {
-    if (!isOpen) return; // don't fetch unless modal is open
+    if (!isOpen) return;
 
     const fetchCategory = async () => {
       try {
@@ -51,12 +60,21 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
         if (res?.success === true) {
           setCategory(res.data);
         }
-      } catch (error) {
-        console.log(error);
+      } catch (err) {
+        console.log(err);
       }
     };
 
     fetchCategory();
+  }, [isOpen]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setForm({ ...initialForm });
+      setError("");
+      setSuccess(false);
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -67,15 +85,7 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
   const labelClass = "text-sm font-medium text-slate-700";
 
   const resetForm = () => {
-    setName("");
-    setDescription("");
-    setCategoryId("");
-    setVariationName("Default");
-    setCostPrice("");
-    setSellingPrice("");
-    setBarcode("");
-    setQuantity("0");
-    setReorderLevel("5");
+    setForm({ ...initialForm });
     setError("");
     setSuccess(false);
   };
@@ -83,6 +93,79 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
   const handleClose = () => {
     resetForm();
     onClose();
+  };
+
+  // Generic change handler for inputs, textarea and select
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    if (error) setError("");
+  };
+
+  const validateForm = () => {
+    if (!form.name.trim()) return "Product name is required.";
+    if (!form.categoryId) return "Please select a category.";
+    if (!form.variationName.trim()) return "Variation name is required.";
+    if (form.costPrice === "" || isNaN(Number(form.costPrice))) return "Enter a valid cost price.";
+    if (form.sellingPrice === "" || isNaN(Number(form.sellingPrice))) return "Enter a valid selling price.";
+    if (form.quantity === "" || isNaN(Number(form.quantity))) return "Enter a valid quantity.";
+    if (form.reorderLevel === "" || isNaN(Number(form.reorderLevel))) return "Enter a valid reorder level.";
+    return null;
+  };
+
+  // Demo submit: build product object, mark success and call optional callback.
+  // Replace with real API call if needed.
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    try {
+      // If you want to call a real API, replace this block with the API call:
+      // const payload = { ...converted values... }
+      // const res = await api.post("add-product", payload)
+      // handle response accordingly
+
+      // Demo product object (constructed from form state)
+      const selectedCategory = category.find((c) => c.id === form.categoryId);
+      const demoProduct: DemoProduct = {
+        id: String(Date.now()),
+        name: form.name,
+        description: form.description,
+        categoryId: form.categoryId,
+        category: selectedCategory?.name ?? "",
+        brandId: "",
+        brand: "",
+        imageUrl: "",
+        variation: {
+          name: form.variationName,
+          costPrice: Number(form.costPrice),
+          sellingPrice: Number(form.sellingPrice),
+          barcode: form.barcode,
+          quantity: Number(form.quantity),
+          reorderLevel: Number(form.reorderLevel),
+        },
+      };
+
+      setSuccess(true);
+      setError("");
+
+      // Call optional callback so parent can update lists
+      if (onProductAdded) onProductAdded(demoProduct);
+
+      // keep the success message visible a short while then reset and close
+      setTimeout(() => {
+        resetForm();
+        onClose();
+      }, 900);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to add product. Try again.");
+    }
   };
 
   return (
@@ -119,7 +202,7 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
         </div>
 
         {/* Form */}
-        <form className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
+        <form onSubmit={handleSubmit} className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
           <section>
             <h3 className="mb-4 text-sm font-semibold text-slate-900">Product information</h3>
 
@@ -131,8 +214,9 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
 
                 <input
                   id="product-name"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
                   placeholder="e.g. Samsung Galaxy A15"
                   className={inputClass}
                   required
@@ -144,18 +228,12 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
                   Category <span className="text-red-500">*</span>
                 </label>
 
-                <select
-                  id="product-category"
-                  value={categoryId}
-                  onChange={(event) => setCategoryId(event.target.value)}
-                  className={inputClass}
-                  required
-                >
+                <select id="product-category" name="categoryId" value={form.categoryId} onChange={handleChange} className={inputClass} required>
                   <option value="">Select category</option>
 
-                  {category.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
+                  {category.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
                     </option>
                   ))}
                 </select>
@@ -168,8 +246,9 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
 
                 <textarea
                   id="product-description"
-                  value={description}
-                  onChange={(event) => setDescription(event.target.value)}
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
                   placeholder="A short description of the product..."
                   rows={3}
                   className={`${inputClass} resize-y`}
@@ -194,8 +273,9 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
 
                 <input
                   id="variation-name"
-                  value={variationName}
-                  onChange={(event) => setVariationName(event.target.value)}
+                  name="variationName"
+                  value={form.variationName}
+                  onChange={handleChange}
                   placeholder="e.g. 128GB or Default"
                   className={inputClass}
                   required
@@ -207,7 +287,7 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
                   Barcode
                 </label>
 
-                <input id="barcode" value={barcode} onChange={(event) => setBarcode(event.target.value)} placeholder="Optional barcode" className={inputClass} />
+                <input id="barcode" name="barcode" value={form.barcode} onChange={handleChange} placeholder="Optional barcode" className={inputClass} />
               </div>
 
               <div>
@@ -215,7 +295,18 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
                   Cost price (₦) <span className="text-red-500">*</span>
                 </label>
 
-                <input id="cost-price" type="number" min="0" step="0.01" value={costPrice} onChange={(event) => setCostPrice(event.target.value)} placeholder="0.00" className={inputClass} required />
+                <input
+                  id="cost-price"
+                  name="costPrice"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.costPrice}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  className={inputClass}
+                  required
+                />
               </div>
 
               <div>
@@ -223,7 +314,18 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
                   Selling price (₦) <span className="text-red-500">*</span>
                 </label>
 
-                <input id="selling-price" type="number" min="0" step="0.01" value={sellingPrice} onChange={(event) => setSellingPrice(event.target.value)} placeholder="0.00" className={inputClass} required />
+                <input
+                  id="selling-price"
+                  name="sellingPrice"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.sellingPrice}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  className={inputClass}
+                  required
+                />
               </div>
 
               <div>
@@ -231,7 +333,7 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
                   Initial quantity
                 </label>
 
-                <input id="quantity" type="number" min="0" step="1" value={quantity} onChange={(event) => setQuantity(event.target.value)} className={inputClass} required />
+                <input id="quantity" name="quantity" type="number" min="0" step="1" value={form.quantity} onChange={handleChange} className={inputClass} required />
               </div>
 
               <div>
@@ -239,7 +341,7 @@ const AddProductModal = ({ isOpen, onClose }: AddProductModalProps) => {
                   Reorder level
                 </label>
 
-                <input id="reorder-level" type="number" min="0" step="1" value={reorderLevel} onChange={(event) => setReorderLevel(event.target.value)} className={inputClass} required />
+                <input id="reorder-level" name="reorderLevel" type="number" min="0" step="1" value={form.reorderLevel} onChange={handleChange} className={inputClass} required />
 
                 <p className="mt-1 text-xs text-slate-400">Alert when stock reaches this level.</p>
               </div>
