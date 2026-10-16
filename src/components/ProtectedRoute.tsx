@@ -3,8 +3,6 @@ import { useUser } from "../context/useContext";
 
 const ProtectedRoute = () => {
   const { user, loading } = useUser();
-
-  console.log(user)
   if (loading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-50">

@@ -1,178 +1,113 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, type BaseSyntheticEvent, type ChangeEvent } from "react";
 import { FiX } from "react-icons/fi";
 import { api } from "../utils/api";
-
-type DemoProduct = {
-  id: string;
-  name: string;
-  description: string;
-  categoryId: string;
-  category: string;
-  brandId: string;
-  brand: string;
-  imageUrl: string;
-  variation: {
-    name: string;
-    costPrice: number;
-    sellingPrice: number;
-    barcode: string;
-    quantity: number;
-    reorderLevel: number;
-  };
-};
-
-type Category = {
-  id: string;
-  name: string;
-};
+import toast from "react-hot-toast";
 
 type AddProductModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onProductAdded?: (product: DemoProduct) => void;
 };
 
-const initialForm = {
-  name: "",
-  description: "",
-  categoryId: "",
-  variationName: "Default",
-  costPrice: "",
-  sellingPrice: "",
-  barcode: "",
-  quantity: "0",
-  reorderLevel: "5",
-};
+const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose }) => {
+  const [category, setCategory] = useState<any[]>([]);
+  const [loader, setLoader] = useState(false)
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    categoryId: "",
+    brandId: "",
+    variations: [
+      {
+        name: "",
+        barcode: "",
+        costPrice: "",
+        sellingPrice: "",
+        quantity: "0",
+        reorderLevel: "5",
+      },
+    ],
+  });
 
-const AddProductModal = ({ isOpen, onClose, onProductAdded }: AddProductModalProps) => {
-  const [form, setForm] = useState(() => ({ ...initialForm }));
-  const [category, setCategory] = useState<Category[]>([]);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement> | ChangeEvent<HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  // Fetch categories only when modal is open
+  const handleVariationChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updatedVariations = [...prev.variations];
+      updatedVariations[0] = { ...updatedVariations[0], [name]: value };
+      return { ...prev, variations: updatedVariations };
+    });
+  };
+
   useEffect(() => {
-    if (!isOpen) return;
-
     const fetchCategory = async () => {
       try {
         const res = await api.get("get-catgory");
-        if (res?.success === true) {
+        if (res.success === true) {
           setCategory(res.data);
+
         }
-      } catch (err) {
-        console.log(err);
+      } catch (error) {
+        console.log(error || "server error");
       }
     };
-
     fetchCategory();
-  }, [isOpen]);
+  }, []);
 
-  // Reset form when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      setForm({ ...initialForm });
-      setError("");
-      setSuccess(false);
+ const handleSubmit = async (e: BaseSyntheticEvent) => {
+    e.preventDefault();
+    setLoader(true);
+
+    const parsedPayload = {
+      name: formData.name.trim(),
+      description: formData.description.trim() || undefined,
+      categoryId: formData.categoryId,
+      brandId: formData.brandId.trim() || undefined,
+      variations: [
+        {
+          name: formData.variations[0].name || "Default",
+          barcode: formData.variations[0].barcode.trim() || undefined,
+          costPrice: Number(formData.variations[0].costPrice) || 0,
+          sellingPrice: Number(formData.variations[0].sellingPrice) || 0,
+          quantity: Number(formData.variations[0].quantity) || 0,
+          reorderLevel: Number(formData.variations[0].reorderLevel) || 0,
+        },
+      ],
+    };
+
+    try {
+      const res = await api.post("create-product", parsedPayload);
+      if (res.success === true) {
+        toast.success(res.message || "Product created successfully!");
+        onClose();
+      }
+    } catch (error: any) {
+      toast.error(error?.message || error?.data?.message || "Something went wrong");
+      console.log(error);
+    } finally {
+      setLoader(false);
     }
-  }, [isOpen]);
+  };
 
-  if (!isOpen) return null;
 
   const inputClass =
     "mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
 
   const labelClass = "text-sm font-medium text-slate-700";
 
-  const resetForm = () => {
-    setForm({ ...initialForm });
-    setError("");
-    setSuccess(false);
-  };
 
-  const handleClose = () => {
-    resetForm();
-    onClose();
-  };
-
-  // Generic change handler for inputs, textarea and select
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (error) setError("");
-  };
-
-  const validateForm = () => {
-    if (!form.name.trim()) return "Product name is required.";
-    if (!form.categoryId) return "Please select a category.";
-    if (!form.variationName.trim()) return "Variation name is required.";
-    if (form.costPrice === "" || isNaN(Number(form.costPrice))) return "Enter a valid cost price.";
-    if (form.sellingPrice === "" || isNaN(Number(form.sellingPrice))) return "Enter a valid selling price.";
-    if (form.quantity === "" || isNaN(Number(form.quantity))) return "Enter a valid quantity.";
-    if (form.reorderLevel === "" || isNaN(Number(form.reorderLevel))) return "Enter a valid reorder level.";
-    return null;
-  };
-
-  // Demo submit: build product object, mark success and call optional callback.
-  // Replace with real API call if needed.
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    try {
-      // If you want to call a real API, replace this block with the API call:
-      // const payload = { ...converted values... }
-      // const res = await api.post("add-product", payload)
-      // handle response accordingly
-
-      // Demo product object (constructed from form state)
-      const selectedCategory = category.find((c) => c.id === form.categoryId);
-      const demoProduct: DemoProduct = {
-        id: String(Date.now()),
-        name: form.name,
-        description: form.description,
-        categoryId: form.categoryId,
-        category: selectedCategory?.name ?? "",
-        brandId: "",
-        brand: "",
-        imageUrl: "",
-        variation: {
-          name: form.variationName,
-          costPrice: Number(form.costPrice),
-          sellingPrice: Number(form.sellingPrice),
-          barcode: form.barcode,
-          quantity: Number(form.quantity),
-          reorderLevel: Number(form.reorderLevel),
-        },
-      };
-
-      setSuccess(true);
-      setError("");
-
-      // Call optional callback so parent can update lists
-      if (onProductAdded) onProductAdded(demoProduct);
-
-      // keep the success message visible a short while then reset and close
-      setTimeout(() => {
-        resetForm();
-        onClose();
-      }, 900);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to add product. Try again.");
-    }
-  };
+  if (!isOpen) return null;
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) handleClose();
+        if (event.target === event.currentTarget) onClose();
       }}
     >
       <div
@@ -187,13 +122,12 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }: AddProductModalPro
             <h2 id="add-product-title" className="text-xl font-semibold text-slate-900">
               Add new product
             </h2>
-
             <p className="mt-1 text-sm text-slate-500">Add a product and its initial stock details.</p>
           </div>
 
           <button
             type="button"
-            onClick={handleClose}
+            onClick={onClose}
             aria-label="Close modal"
             className="rounded-lg p-2 cursor-pointer text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
           >
@@ -211,12 +145,11 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }: AddProductModalPro
                 <label htmlFor="product-name" className={labelClass}>
                   Product name <span className="text-red-500">*</span>
                 </label>
-
                 <input
                   id="product-name"
                   name="name"
-                  value={form.name}
-                  onChange={handleChange}
+                  value={formData.name}
+                  onChange={handleInputChange}
                   placeholder="e.g. Samsung Galaxy A15"
                   className={inputClass}
                   required
@@ -227,32 +160,21 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }: AddProductModalPro
                 <label htmlFor="product-category" className={labelClass}>
                   Category <span className="text-red-500">*</span>
                 </label>
-
-                <select id="product-category" name="categoryId" value={form.categoryId} onChange={handleChange} className={inputClass} required>
+                <select
+                  id="product-category"
+                  name="categoryId"
+                  value={formData.categoryId}
+                  onChange={handleInputChange}
+                  className={inputClass}
+                  required
+                >
                   <option value="">Select category</option>
-
-                  {category.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
+                  {category?.map((e) => (
+                    <option value={e.id} key={e.id}>
+                      {e.name}
                     </option>
                   ))}
                 </select>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label htmlFor="product-description" className={labelClass}>
-                  Description
-                </label>
-
-                <textarea
-                  id="product-description"
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  placeholder="A short description of the product..."
-                  rows={3}
-                  className={`${inputClass} resize-y`}
-                />
               </div>
             </div>
           </section>
@@ -262,7 +184,6 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }: AddProductModalPro
           {/* Pricing and stock */}
           <section>
             <h3 className="mb-1 text-sm font-semibold text-slate-900">Pricing and stock</h3>
-
             <p className="mb-4 text-xs text-slate-500">Set the price and initial stock for this product.</p>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -270,12 +191,11 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }: AddProductModalPro
                 <label htmlFor="variation-name" className={labelClass}>
                   Variation name <span className="text-red-500">*</span>
                 </label>
-
                 <input
                   id="variation-name"
-                  name="variationName"
-                  value={form.variationName}
-                  onChange={handleChange}
+                  name="name"
+                  value={formData.variations[0].name}
+                  onChange={handleVariationChange}
                   placeholder="e.g. 128GB or Default"
                   className={inputClass}
                   required
@@ -286,23 +206,28 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }: AddProductModalPro
                 <label htmlFor="barcode" className={labelClass}>
                   Barcode
                 </label>
-
-                <input id="barcode" name="barcode" value={form.barcode} onChange={handleChange} placeholder="Optional barcode" className={inputClass} />
+                <input
+                  id="barcode"
+                  name="barcode"
+                  value={formData.variations[0].barcode}
+                  onChange={handleVariationChange}
+                  placeholder="Optional barcode"
+                  className={inputClass}
+                />
               </div>
 
               <div>
                 <label htmlFor="cost-price" className={labelClass}>
                   Cost price (₦) <span className="text-red-500">*</span>
                 </label>
-
                 <input
                   id="cost-price"
                   name="costPrice"
                   type="number"
                   min="0"
                   step="0.01"
-                  value={form.costPrice}
-                  onChange={handleChange}
+                  value={formData.variations[0].costPrice}
+                  onChange={handleVariationChange}
                   placeholder="0.00"
                   className={inputClass}
                   required
@@ -313,15 +238,14 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }: AddProductModalPro
                 <label htmlFor="selling-price" className={labelClass}>
                   Selling price (₦) <span className="text-red-500">*</span>
                 </label>
-
                 <input
                   id="selling-price"
                   name="sellingPrice"
                   type="number"
                   min="0"
                   step="0.01"
-                  value={form.sellingPrice}
-                  onChange={handleChange}
+                  value={formData.variations[0].sellingPrice}
+                  onChange={handleVariationChange}
                   placeholder="0.00"
                   className={inputClass}
                   required
@@ -332,44 +256,56 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }: AddProductModalPro
                 <label htmlFor="quantity" className={labelClass}>
                   Initial quantity
                 </label>
-
-                <input id="quantity" name="quantity" type="number" min="0" step="1" value={form.quantity} onChange={handleChange} className={inputClass} required />
+                <input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={formData.variations[0].quantity}
+                  onChange={handleVariationChange}
+                  className={inputClass}
+                />
               </div>
 
               <div>
                 <label htmlFor="reorder-level" className={labelClass}>
                   Reorder level
                 </label>
-
-                <input id="reorder-level" name="reorderLevel" type="number" min="0" step="1" value={form.reorderLevel} onChange={handleChange} className={inputClass} required />
-
+                <input
+                  id="reorder-level"
+                  name="reorderLevel"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={formData.variations[0].reorderLevel}
+                  onChange={handleVariationChange}
+                  className={inputClass}
+                />
                 <p className="mt-1 text-xs text-slate-400">Alert when stock reaches this level.</p>
               </div>
             </div>
           </section>
 
-          {/* Feedback */}
-          {error && (
-            <p role="alert" className="rounded-lg bg-red-50 px-3 py-2.5 text-sm text-red-600">
-              {error}
-            </p>
-          )}
-
-          {success && (
-            <p role="status" className="rounded-lg bg-green-50 px-3 py-2.5 text-sm text-green-700">
-              Demo product added successfully!
-            </p>
-          )}
-
           {/* Footer */}
           <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
-            <button type="button" onClick={handleClose} className="rounded-lg cursor-pointer border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg cursor-pointer border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+            >
               Cancel
             </button>
 
-            <button type="submit" disabled={success} className="rounded-lg cursor-pointer bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60">
-              {success ? "Product added" : "Save product"}
+            <button
+              type="submit"
+              disabled={loader}
+              className="rounded-lg cursor-pointer bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {loader ? "Adding Product...." : "Add product"}
             </button>
+
+
           </div>
         </form>
       </div>
