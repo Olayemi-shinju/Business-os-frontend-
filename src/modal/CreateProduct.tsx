@@ -8,7 +8,7 @@ type AddProductModalProps = {
   onClose: () => void;
 };
 
-const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose }) => {
+const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, }) => {
   const [category, setCategory] = useState<any[]>([]);
   const [loader, setLoader] = useState(false)
   const [formData, setFormData] = useState({
