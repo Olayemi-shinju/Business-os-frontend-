@@ -6,6 +6,7 @@ import { FiLogOut, FiShoppingCart } from "react-icons/fi";
 import { IoMdPerson } from "react-icons/io";
 import { NavLink, useNavigate } from "react-router-dom";
 import { IoSettingsOutline } from "react-icons/io5";
+import { FaLayerGroup } from "react-icons/fa";
 import "../App.css";
 import toast from "react-hot-toast";
 import { api } from "../utils/api";
@@ -16,6 +17,7 @@ const workSpace = [
     { label: "Inventory", path: "/inventory", icon: MdOutlineInventory, notification: 3 },
     { label: "Sales", path: "/sales", icon: FiShoppingCart },
     { label: "Staff", path: "/staff", icon: IoMdPerson },
+    { label: "Category", path: "/categories", icon: FaLayerGroup },
 ];
 
 const Manage = [

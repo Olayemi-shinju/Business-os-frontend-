@@ -10,6 +10,7 @@ import Login from "./authentication/Login";
 import Register from "./authentication/Register";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Category from "./pages/Category";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Overview />} />
             <Route path="products" element={<Product />} />
+            <Route path="categories" element={<Category />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="sales" element={<Sales />} />
             <Route path="staff" element={<Staff />} />

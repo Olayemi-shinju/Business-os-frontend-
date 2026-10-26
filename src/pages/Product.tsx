@@ -5,6 +5,7 @@ import { useUser } from '../context/useContext'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../utils/api'
 import toast from 'react-hot-toast'
+import ConfirmDelete from '../modal/ConfirmDelete'
 
 const Product = () => {
   const { user } = useUser()
@@ -14,6 +15,7 @@ const Product = () => {
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [productId, setProductId] = useState("")
+  const [open, setOpen] = useState(false)
 
   const formattedDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -21,13 +23,10 @@ const Product = () => {
     month: 'long',
     day: 'numeric',
   })
-
-  // redirect if not signed in
   useEffect(() => {
     if (!user) navigate('/login')
   }, [user, navigate])
 
-  // fetch products when search changes (simple debounce)
   useEffect(() => {
     if (!user) return
     setLoading(true)
@@ -80,18 +79,7 @@ const Product = () => {
     return () => window.clearTimeout(id)
   }, [search, user])
 
-  // const handleDelete = async(e:BaseSyntheticEvent)=>{
-  //   e.preventDefault()
-  //   try {
-  //     const res = await api.delete(`/delete-product/${productId}`)
-  //     if(res?.success === true){
-        
-  //     }
-  //   } catch (error) {
-  //     toast.error(error.message || "An error occurred")
-  //     console.log(error.message)
-  //   }
-  // }
+
 
   const renderInventory = (v: any) => {
     const qty = Number(v?.quantity ?? 0)
@@ -141,7 +129,7 @@ const Product = () => {
         </div>
         <div className="mt-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <p className="text-2xl font-medium">Good Morning, {user?.firstName}</p>
+            <p className="text-2xl font-medium">Welcome Back, {user?.firstName}</p>
             <span className="text-xs font-semibold text-slate-500">Here's what's happening with your store today.</span>
           </div>
           <div>
@@ -220,7 +208,7 @@ const Product = () => {
                           <td className="py-4 px-6 text-right">
                             <div className="flex justify-end gap-3 text-xs">
                               <button className="text-purple-600 hover:text-purple-800 font-semibold">Edit</button>
-                              <button onClick={()=> setProductId(p.id) } className="text-slate-400 hover:text-red-600 font-semibold" >Delete</button>
+                              <button onClick={() => setOpen(true)} className="text-slate-400 hover:text-red-600 font-semibold" >Delete</button>
                             </div>
                           </td>
                         </tr>
@@ -235,6 +223,7 @@ const Product = () => {
       </section>
 
       <AddProductModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+
     </div>
   )
 }

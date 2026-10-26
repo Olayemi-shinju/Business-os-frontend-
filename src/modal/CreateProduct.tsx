@@ -2,6 +2,7 @@ import React, { useEffect, useState, type BaseSyntheticEvent, type ChangeEvent }
 import { FiX } from "react-icons/fi";
 import { api } from "../utils/api";
 import toast from "react-hot-toast";
+import { useUser } from "../context/useContext";
 
 type AddProductModalProps = {
   isOpen: boolean;
@@ -9,7 +10,8 @@ type AddProductModalProps = {
 };
 
 const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, }) => {
-  const [category, setCategory] = useState<any[]>([]);
+  const {category} = useUser()
+  console.log(category)
   const [loader, setLoader] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -44,20 +46,6 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, }) =
     });
   };
 
-  useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const res = await api.get("get-catgory");
-        if (res.success === true) {
-          setCategory(res.data);
-
-        }
-      } catch (error) {
-        console.log(error || "server error");
-      }
-    };
-    fetchCategory();
-  }, []);
 
  const handleSubmit = async (e: BaseSyntheticEvent) => {
     e.preventDefault();

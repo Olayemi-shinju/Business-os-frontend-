@@ -49,7 +49,7 @@ const Sales = () => {
 
         <div className="my-3 flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
           <div className="flex gap-3 flex-col">
-            <p className="text-2xl font-medium text-gray-900">Good Morning, {user?.firstName}</p>
+            <p className="text-2xl font-medium text-gray-900">Welcome Back, {user?.firstName}</p>
             <span className="text-xs font-semibold text-slate-500">Here's what's happening with your store today.</span>
           </div>
           <div>
