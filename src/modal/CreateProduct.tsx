@@ -11,7 +11,6 @@ type AddProductModalProps = {
 
 const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, }) => {
   const {category} = useUser()
-  console.log(category)
   const [loader, setLoader] = useState(false)
   const [formData, setFormData] = useState({
     name: "",

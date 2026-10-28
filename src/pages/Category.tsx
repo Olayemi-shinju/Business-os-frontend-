@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useUser } from "../context/useContext";
 import { FiPlus } from "react-icons/fi";
+import toast from "react-hot-toast";
 import CreateCategory from "../modal/CreateCategory";
 import EditCategory from "../modal/EditModal";
 import ConfirmDelete from "../modal/ConfirmDelete";
+import { api } from "../utils/api";
 
 type CategoryItem = {
     id: string;
@@ -15,9 +17,15 @@ const Category = () => {
     const [search, setSearch] = useState("");
     const [isModalOpen, setModalOpen] = useState(false);
     const [openEditModal, setOpenEditModal] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState<CategoryItem | null>(null);
-    const [openConfirmModal, setOpenConfirmModal] = useState<CategoryItem | null>(Boolean);
-    const { user, category } = useUser();
+    const [selectedCategory, setSelectedCategory] =
+        useState<CategoryItem | null>(null);
+
+    const [openConfirmModal, setOpenConfirmModal] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] =
+        useState<CategoryItem | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const { user, category, setCategory } = useUser();
 
     const formattedDate = new Date().toLocaleDateString("en-US", {
         weekday: "long",
@@ -29,6 +37,45 @@ const Category = () => {
     const filteredCategories = category.filter((item: CategoryItem) =>
         item.name.toLowerCase().includes(search.toLowerCase().trim()),
     );
+
+    const closeDeleteModal = () => {
+        if (isDeleting) return;
+
+        setOpenConfirmModal(false);
+        setCategoryToDelete(null);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!categoryToDelete || isDeleting) return;
+
+        setIsDeleting(true);
+
+        try {
+            const res = await api.delete(
+                `delete-category/${categoryToDelete.id}`,
+            );
+
+            if (res.success) {
+                setCategory((previousCategories: CategoryItem[]) =>
+                    previousCategories.filter(
+                        (item) => item.id !== categoryToDelete.id,
+                    ),
+                );
+
+                toast.success(res.message || "Category deleted successfully.");
+
+                setOpenConfirmModal(false);
+                setCategoryToDelete(null);
+            } else {
+                toast.error(res.message || "Failed to delete category.");
+            }
+        } catch (error) {
+            console.error("Failed to delete category:", error);
+            toast.error("Failed to delete category. Please try again.");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 p-4 text-slate-900 sm:p-8">
@@ -50,6 +97,7 @@ const Category = () => {
                         </div>
 
                         <button
+                            type="button"
                             onClick={() => setModalOpen(true)}
                             className="btn-new-sale flex cursor-pointer items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold transition-colors duration-200"
                         >
@@ -88,10 +136,7 @@ const Category = () => {
 
                             <tbody className="divide-y divide-slate-100">
                                 {filteredCategories.map((item: CategoryItem) => (
-                                    <tr
-                                        key={item.id}
-                                        className="hover:bg-slate-50"
-                                    >
+                                    <tr key={item.id} className="hover:bg-slate-50">
                                         <td className="px-5 py-4 font-medium">
                                             {item.name}
                                         </td>
@@ -103,8 +148,8 @@ const Category = () => {
                                         <td className="px-5 py-4">
                                             <div className="flex justify-end gap-2">
                                                 <button
+                                                    type="button"
                                                     onClick={() => {
-                                                        console.log("Clicked category:", item);
                                                         setSelectedCategory(item);
                                                         setOpenEditModal(true);
                                                     }}
@@ -114,7 +159,11 @@ const Category = () => {
                                                 </button>
 
                                                 <button
-                                                // onClick={()=>setOpenConfirmModal(true)}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setCategoryToDelete(item);
+                                                        setOpenConfirmModal(true);
+                                                    }}
                                                     className="cursor-pointer rounded-md border border-red-200 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
                                                 >
                                                     Delete
@@ -154,9 +203,16 @@ const Category = () => {
                 category={selectedCategory}
             />
 
-
-
-            
+            <ConfirmDelete
+                isOpen={openConfirmModal}
+                onClose={closeDeleteModal}
+                onConfirm={handleDeleteConfirm}
+                title="Delete Category"
+                message={`Are you sure you want to permanently delete "${
+                    categoryToDelete?.name ?? "this category"
+                }"? This action cannot be undone.`}
+                loader={isDeleting}
+            />
         </div>
     );
 };
