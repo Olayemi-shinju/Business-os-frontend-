@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { FiPlus, FiSearch, FiSliders } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+
 import AddProductModal from "../modal/CreateProduct";
+import EditProduct from "../modal/editProduct";
 import ConfirmDelete from "../modal/ConfirmDelete";
 import { useUser } from "../context/useContext";
 import { api } from "../utils/api";
@@ -20,6 +22,8 @@ type Variation = {
 type ProductItem = {
   id: string;
   name: string;
+  description?: string;
+  categoryId?: string;
   variations?: Variation[];
 };
 
@@ -31,9 +35,10 @@ const Product = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [refresh, setRefresh] = useState(0);
 
-  const [productToDelete, setProductToDelete] =
-    useState<ProductItem | null>(null);
+  const [productToEdit, setProductToEdit] = useState<ProductItem | null>(null);
+  const [productToDelete, setProductToDelete] = useState<ProductItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const formattedDate = new Date().toLocaleDateString("en-US", {
@@ -68,7 +73,6 @@ const Product = () => {
           return;
         }
 
-      
         if (res.type === "barcode" && res.data) {
           const variation = res.data;
           const product = variation.product;
@@ -100,7 +104,7 @@ const Product = () => {
       cancelled = true;
       window.clearTimeout(timeout);
     };
-  }, [search, user]);
+  }, [search, user, refresh]);
 
   const handleDelete = async () => {
     if (!productToDelete || isDeleting) return;
@@ -108,7 +112,6 @@ const Product = () => {
     setIsDeleting(true);
 
     try {
-    
       const res = await api.delete(
         `delete-product/${productToDelete.id}`
       );
@@ -118,7 +121,6 @@ const Product = () => {
         return;
       }
 
-   
       setProducts((current) =>
         current.filter((product) => product.id !== productToDelete.id)
       );
@@ -160,8 +162,8 @@ const Product = () => {
     <div className="flex justify-end gap-3 text-xs">
       <button
         type="button"
+        onClick={() => setProductToEdit(product)}
         className="font-semibold text-purple-600 hover:text-purple-800"
-        onClick={() => toast("Product editing is not connected yet.")}
       >
         Edit
       </button>
@@ -230,12 +232,15 @@ const Product = () => {
             {variation.name || "No variations"}
           </div>
         </td>
+
         <td className="px-6 py-4">
           ₦{Number(variation.costPrice ?? 0).toLocaleString()}
         </td>
+
         <td className="px-6 py-4 font-semibold">
           ₦{Number(variation.sellingPrice ?? 0).toLocaleString()}
         </td>
+
         <td className="px-6 py-4">{renderInventory(variation)}</td>
         <td className="px-6 py-4">{renderProductActions(product)}</td>
       </tr>
@@ -301,12 +306,15 @@ const Product = () => {
               <div className="mb-3 rounded-full bg-slate-100 p-4">
                 <FiSearch size={24} className="text-slate-400" />
               </div>
+
               <h3 className="text-sm font-semibold text-slate-900">
                 No products found
               </h3>
+
               <p className="mt-1 max-w-xs text-xs text-slate-500">
                 Try searching or add a new product to get started.
               </p>
+
               <button
                 type="button"
                 onClick={() => setModalOpen(true)}
@@ -332,6 +340,7 @@ const Product = () => {
                       <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
                   </thead>
+
                   <tbody className="divide-y divide-slate-100 text-sm">
                     {products.map((product) => renderProduct(product))}
                   </tbody>
@@ -345,6 +354,15 @@ const Product = () => {
       <AddProductModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
+      />
+
+      <EditProduct
+        isOpen={Boolean(productToEdit)}
+        product={productToEdit}
+        onClose={() => {
+          setProductToEdit(null);
+          setRefresh((current) => current + 1);
+        }}
       />
 
       <ConfirmDelete
